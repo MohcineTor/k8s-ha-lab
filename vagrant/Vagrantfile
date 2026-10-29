@@ -1,0 +1,62 @@
+Vagrant.configure("2") do |config|
+    config.vm.box = "debian/bookworm64"
+
+    # Load balancer Principal
+    config.vm.define "lb" do |lb|
+        lb.vm.hostname = "lb"
+        lb.vm.network "private_network", ip: "192.168.56.20"
+        lb.vm.provider "virtualbox" do |vb|
+            vb.memory = "512"
+            vb.cpus = 1
+        end
+        lb.vm.provision "shell", path: "../scripts/haproxy.sh"
+    end
+
+    # Load balancer Secondaire
+    config.vm.define "lb2" do |lb2|
+        lb2.vm.hostname = "lb2"
+        lb2.vm.network "private_network", ip: "192.168.56.30"
+        lb2.vm.provider "virtualbox" do |vb|
+            vb.memory = "512"
+            vb.cpus = 1
+        end
+        lb2.vm.provision "shell", path: "../scripts/haproxy.sh"
+    end
+
+    # Serveur de monitoring : Prometheus + Grafana
+    config.vm.define "monitoring" do |mon|
+        mon.vm.hostname = "monitoring"
+        mon.vm.network "private_network", ip: "192.168.56.40"
+
+        mon.vm.provider "virtualbox" do |vb|
+            vb.memory = "2048"
+            vb.cpus = 2
+        end
+    end
+
+    # Création des 3 Masters
+    (1..3).each do |i|
+        config.vm.define "master#{i}" do |master|
+        master.vm.hostname = "master#{i}"
+        master.vm.network "private_network", ip: "192.168.56.1#{i}"
+        master.vm.provider "virtualbox" do |vb|
+            vb.memory = "2048"
+            vb.cpus = 2
+        end
+        master.vm.provision "shell", path: "../scripts/bootstrap.sh"
+        end
+    end
+
+    # Création des 2 Workers
+    (1..2).each do |i|
+        config.vm.define "worker#{i}" do |worker|
+            worker.vm.hostname = "worker#{i}"
+            worker.vm.network "private_network", ip: "192.168.56.2#{i}"
+            worker.vm.provider "virtualbox" do |vb|
+                vb.memory = "2048"
+                vb.cpus = 2
+            end
+            worker.vm.provision "shell", path: "../scripts/bootstrap.sh"
+        end
+    end
+end
