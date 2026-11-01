@@ -1,0 +1,39 @@
+groups:
+  - name: etcd-backup-alerts
+    rules:
+
+      - alert: EtcdBackupFailed
+        expr: etcd_backup_last_status == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Échec de sauvegarde etcd"
+          description: "La dernière tentative de sauvegarde etcd a échoué sur master1."
+
+      - alert: EtcdBackupUploadFailed
+        expr: etcd_backup_upload_status == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Échec upload SeaweedFS"
+          description: "Le dernier upload de sauvegarde etcd a échoué."
+
+      - alert: EtcdBackupTooOld
+        expr: time() - etcd_backup_last_success_timestamp > 93600
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Sauvegarde etcd trop ancienne"
+          description: "Aucune sauvegarde réussie depuis plus de 26 heures."
+
+      - alert: EtcdBackupMetricsMissing
+        expr: absent(etcd_backup_last_status)
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Métriques de sauvegarde absentes"
+          description: "Prometheus ne reçoit plus les métriques de sauvegarde etcd."

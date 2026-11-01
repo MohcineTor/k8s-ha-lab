@@ -123,6 +123,28 @@ scrape_configs:
         labels:
           server: "lb2"
           role: "secondary"
+  - job_name: "kubernetes-masters"
+    static_configs:
+      - targets: ["192.168.56.11:9100"]
+        labels:
+          server: "master1"
+          role: "control-plane"
+
+      - targets: ["192.168.56.12:9100"]
+        labels:
+          server: "master2"
+          role: "control-plane"
+
+      - targets: ["192.168.56.13:9100"]
+        labels:
+          server: "master3"
+          role: "control-plane"
+  - job_name: "etcd-backup"
+    static_configs:
+      - targets: ["192.168.56.11:9100"]
+        labels:
+          server: "master1"
+          role: "etcd-backup"
 ```
 
 ### 3.2. Configuration explanation

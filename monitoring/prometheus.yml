@@ -1,0 +1,45 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "load-balancers"
+    static_configs:
+      - targets:
+        - "192.168.56.20:9100"
+        labels:
+          server: "lb1"
+          role: "primary"
+      - targets:
+        - "192.168.56.30:9100"
+        labels:
+          server: "lb2"
+          role: "secondary"
+
+  - job_name: "kubernetes-masters"
+    static_configs:
+      - targets: ["192.168.56.11:9100"]
+        labels:
+          server: "master1"
+          role: "control-plane"
+
+      - targets: ["192.168.56.12:9100"]
+        labels:
+          server: "master2"
+          role: "control-plane"
+
+      - targets: ["192.168.56.13:9100"]
+        labels:
+          server: "master3"
+          role: "control-plane"
+
+  - job_name: "etcd-backup"
+    static_configs:
+      - targets: ["192.168.56.11:9100"]
+        labels:
+          server: "master1"
+          role: "etcd-backup"
