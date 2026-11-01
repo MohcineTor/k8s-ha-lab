@@ -1,4 +1,4 @@
-# 03. Monitoring and Observability with Prometheus and Grafana
+# 04. Monitoring and Observability with Prometheus and Grafana
 
 ## 1. Overview
 

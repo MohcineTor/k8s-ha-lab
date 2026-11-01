@@ -1,0 +1,25 @@
+services:
+  seaweedfs:
+    image: chrislusf/seaweedfs:latest
+    container_name: seaweedfs
+    restart: unless-stopped
+
+    command:
+      - mini
+      - -dir=/data
+
+    env_file:
+      - .env
+
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY}
+      S3_BUCKET: etcd-backups
+
+    ports:
+      - "192.168.56.40:8333:8333"
+
+    volumes:
+      - /srv/seaweedfs:/data
+
+    stop_grace_period: 30s
